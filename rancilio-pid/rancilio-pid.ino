@@ -1776,7 +1776,7 @@ void setup() {
         Input = Sensor2.getTemp();
      #endif
      #if (defined(ESP32))
-      sensor3 = TsicSensor::create(ONE_WIRE_BUS), TsicExternalVcc, TsicType::TSIC_306);
+      sensor3 = TsicSensor::create(ONE_WIRE_BUS, TsicExternalVcc, TsicType::TSIC_306);
       Input = sensor3->getTempCelsius();
      #endif
   }
