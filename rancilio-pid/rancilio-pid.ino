@@ -256,8 +256,13 @@ float Temperatur_C = 0;       // internal variable that holds the converted temp
 
 #if (ONE_WIRE_BUS == 16  && TEMPSENSOR  == 2 && defined(ESP8266)) 
 TSIC Sensor1(ONE_WIRE_BUS);   // only Signalpin, VCCpin unused by default
-#else 
+#endif
+#if (ONE_WIRE_BUS =! 16  && TEMPSENSOR  == 2 && defined(ESP8266)) 
 ZACwire<ONE_WIRE_BUS> Sensor2(306);    // set pin "2" to receive signal from the TSic "306"
+#endif
+#if (defined(ESP32))
+#include <TsicSensor.h>
+TsicSensor* sensor3;
 #endif
 /********************************************************
    BLYNK
@@ -645,8 +650,11 @@ void refreshTemp() {
          Sensor1.getTemperature(&temperature);
          Temperatur_C = Sensor1.calc_Celsius(&temperature);
          #endif
-       #if (ONE_WIRE_BUS != 16)
+       #if (ONE_WIRE_BUS != 16 && defined(ESP8266))
         Temperatur_C = Sensor2.getTemp();
+       #endif
+       #if (defined(ESP32))
+       Temperatur_C = sensor3->getTempCelsius();
        #endif
       //Temperatur_C = 70;
       if (!checkSensor(Temperatur_C) && firstreading == 0) return;  //if sensor data is not valid, abort function; Sensor must be read at least one time at system startup
@@ -1760,12 +1768,16 @@ void setup() {
 
   if (TempSensor == 2) {
     temperature = 0;
-    #if (ONE_WIRE_BUS == 16)
+    #if (ONE_WIRE_BUS == 16 && defined(ESP8266))
          Sensor1.getTemperature(&temperature);
          Input = Sensor1.calc_Celsius(&temperature);
     #endif
-    #if (ONE_WIRE_BUS != 16)
+    #if (ONE_WIRE_BUS != 16 && defined(ESP8266))
         Input = Sensor2.getTemp();
+     #endif
+     #if (defined(ESP32))
+      sensor3 = TsicSensor::create(ONE_WIRE_BUS), TsicExternalVcc, TsicType::TSIC_306);
+      Input = sensor3->getTempCelsius();
      #endif
   }
 
@@ -1779,9 +1791,10 @@ void setup() {
       readingchangerate[thisReading] = 0;
     }
   }
+  /* notwendig??
   if (TempSensor == 2) {
     temperature = 0;
-    #if (ONE_WIRE_BUS == 16)
+    #if (ONE_WIRE_BUS == 16 )
          Sensor1.getTemperature(&temperature);
          Input = Sensor1.calc_Celsius(&temperature);
     #endif
@@ -1789,6 +1802,7 @@ void setup() {
         Input = Sensor2.getTemp();
      #endif
   }
+   sensor3->getTempCelsius(); */
 
   //Initialisation MUST be at the very end of the init(), otherwise the time comparision in loop() will have a big offset
   unsigned long currentTime = millis();
