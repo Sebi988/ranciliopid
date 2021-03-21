@@ -257,7 +257,7 @@ float Temperatur_C = 0;       // internal variable that holds the converted temp
 #if (ONE_WIRE_BUS == 16  && TEMPSENSOR  == 2 && defined(ESP8266)) 
 TSIC Sensor1(ONE_WIRE_BUS);   // only Signalpin, VCCpin unused by default
 #endif
-#if (ONE_WIRE_BUS =! 16  && TEMPSENSOR  == 2 && defined(ESP8266)) 
+#if (ONE_WIRE_BUS != 16  && TEMPSENSOR  == 2 && defined(ESP8266)) 
 ZACwire<ONE_WIRE_BUS> Sensor2(306);    // set pin "2" to receive signal from the TSic "306"
 #endif
 #if (defined(ESP32))
