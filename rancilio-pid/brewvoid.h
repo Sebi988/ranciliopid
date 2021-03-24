@@ -99,6 +99,21 @@ void backflush() {
       }
       break;
   }
+    if (backflushON || backflushState > 10) {
+    if (backflushState == 43) {
+      #if DISPLAY != 0
+        displayMessage("Backflush finished", "Please reset brewswitch...", "", "", "", "");
+      #endif 
+    } else if (backflushState == 10) {
+      #if DISPLAY != 0
+        displayMessage("Backflush activated", "Please set brewswitch...", "", "", "", "");
+      #endif
+    } else if ( backflushState > 10) {
+      #if DISPLAY != 0
+        displayMessage("Backflush running:", String(flushCycles), "from", String(maxflushCycles), "", "");
+      #endif
+    }
+  }
 }
 
 

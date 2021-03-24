@@ -1033,308 +1033,15 @@ void checkSteamON()
     setPoint = BrewSetPoint ;
   }
 }
+  /********************************************************
+    Define trigger type
+  ******************************************************/
 
-void machinestatevoid() 
-{
-  /* 
-  00 = init
-  10 = kaltstart
-  19 = Setpoint -1 Celsius
-  20 = Setpoint überschritten, idel at setpoint
-  30 = Bezug 
-  35 = Nachlauf BD
-  40 = Dampf
-  80 = Emergency Stop
-  90 = PID Offline
-  100 = Sensorerror
-  */
-  //DEBUG_println(machinestate);
-  switch (machinestate) 
-  {
-    // init
-    case 0: 
-      if (Input < (BrewSetPoint-1) )
-      {
-        machinestate = 10 ; // kaltstart
-      }
-      if (Input >= (BrewSetPoint-1) )
-      {
-        machinestate = 19 ; // machine is hot, jump to other state
-      }
-      
-      if (emergencyStop)
-      {
-        machinestate = 80 ; // Emergency Stop
-      }
-     if (pidON == 0)
-      {
-        machinestate = 90 ; // offline
-      }
-     if(sensorError)
-      {
-        machinestate = 100 ;// sensorerror
-      }
-    break;
+  #include "machinestate.h"
 
-     // kaltstart
-    case 10: 
-      if (Input >= (BrewSetPoint-1) )
-      {
-        machinestate = 19 ;
-      }
-      if (SteamON == 1)
-      {
-        machinestate = 40 ; // Steam
-      }
-
-      if
-      (
-       (bezugsZeit > 0 && ONLYPID == 1) || // Bezugszeit bei Only PID  
-       (ONLYPID == 0 && brewcounter > 10 && brewcounter <= 42) 
-      )
-      
-      {
-        machinestate = 30 ; // Brew
-      }
-
-      if (SteamON == 1)
-      {
-        machinestate = 40 ; // switch to  Steam
-      }
-      if (emergencyStop)
-      {
-        machinestate = 80 ; // Emergency Stop
-      }
-     if (pidON == 0)
-      {
-        machinestate = 90 ; // offline
-      }
-     if(sensorError)
-      {
-        machinestate = 100 ;// sensorerror
-      }
-      // Setpoint -1 Celsius
-      case 19: 
-      if (Input >= (BrewSetPoint))
-      {
-        machinestate = 20 ;
-      }
-      if
-      (
-       (bezugsZeit > 0 && ONLYPID == 1) || // Bezugszeit bei Only PID  
-       (ONLYPID == 0 && brewcounter > 10 && brewcounter <= 42) 
-      )
-      {
-        machinestate = 30 ; // Brew
-      }
-
-      
-      if (SteamON == 1)
-      {
-        machinestate = 40 ; // Steam
-      }
-
-      if (SteamON == 1)
-      {
-        machinestate = 40 ; // switch to  Steam
-      }
-      if (emergencyStop)
-      {
-        machinestate = 80 ; // Emergency Stop
-      }
-     if (pidON == 0)
-      {
-        machinestate = 90 ; // offline
-      }
-     if(sensorError)
-      {
-        machinestate = 100 ;// sensorerror
-      }  
-    break;
-    // normal PID
-    case 20: 
-      if
-      (
-       (bezugsZeit > 0 && ONLYPID == 1) || // Bezugszeit bei Only PID  
-       (ONLYPID == 0 && brewcounter > 10 && brewcounter <= 42) 
-      )
-      {
-        machinestate = 30 ; // Brew
-      }
-      if (SteamON == 1)
-      {
-        machinestate = 40 ; // Steam
-      }
-
-      if (emergencyStop)
-      {
-        machinestate = 80 ; // Emergency Stop
-      }
-     if (pidON == 0)
-      {
-        machinestate = 90 ; // offline
-      }
-     if(sensorError)
-      {
-        machinestate = 100 ;// sensorerror
-      }
-    break;
-     // Brew
-    case 30:
-      if
-      (
-       (bezugsZeit > 35*1000 && Brewdetection == 1 && ONLYPID == 1  ) ||  // 35 sec later and BD PID aktive SW Solution
-       (bezugsZeit == 0      && Brewdetection == 3 && ONLYPID == 1  ) ||  // Voltagesensor reset bezugsZeit == 0
-       ((brewcounter == 10 || brewcounter == 43)   && ONLYPID == 0  ) // switchoff BD PID aktive
-      )
-      {
-       if ((ONLYPID == 1 && Brewdetection == 3) || ONLYPID == 0 ) // only delay of shotimer for voltagesensor or brewcounter
-       {
-         machinestate = 31 ;
-         lastbezugszeitMillis = millis() ; // for delay
-        
-       }
-       if (ONLYPID == 1 && Brewdetection == 1 && timerBrewdetection == 1) //direct to PID BD
-       {
-         machinestate = 35 ;
-       }
-      } 
-      if (SteamON == 1)
-      {
-        machinestate = 40 ; // Steam
-      }
-
-      if (emergencyStop)
-      {
-        machinestate = 80 ; // Emergency Stop
-      }
-     if (pidON == 0)
-      {
-        machinestate = 90 ; // offline
-      }
-     if(sensorError)
-      {
-        machinestate = 100 ;// sensorerror
-      }
-    break;
-    // Sec after shot finish
-    case 31: //lastbezugszeitMillis
-      if ( millis()-lastbezugszeitMillis > BREWSWITCHDELAY )
-      {
-       machinestate = 35 ;
-       lastbezugszeit = 0 ;
-      }
-      if (SteamON == 1)
-      {
-        machinestate = 40 ; // Steam
-      }
-
-      if (emergencyStop)
-      {
-        machinestate = 80 ; // Emergency Stop
-      }
-     if (pidON == 0)
-      {
-        machinestate = 90 ; // offline
-      }
-     if(sensorError)
-      {
-        machinestate = 100 ;// sensorerror
-      }
-    break;
-    // BD PID
-    case 35:
-      if (timerBrewdetection == 0)
-      {
-        machinestate = 20 ; // switch to normal PID
-      }
-      if
-      (
-       (bezugsZeit > 0 && ONLYPID == 1  && Brewdetection == 3) || // New Brew inner BD only by Only PID AND Voltage Sensor
-       (ONLYPID == 0 && brewcounter > 10 && brewcounter <= 42) 
-      )
-      {
-        machinestate = 30 ; // Brew
-      }
-      
-      if (SteamON == 1)
-      {
-        machinestate = 40 ; // switch to  Steam
-      }
-
-      if (emergencyStop)
-      {
-        machinestate = 80 ; // Emergency Stop
-      }
-      if (pidON == 0)
-      {
-        machinestate = 90 ; // offline
-      }
-     if(sensorError)
-      {
-        machinestate = 100 ;// sensorerror
-      }
-    break;
-    // Steam
-    case 40:
-      if (SteamON == 0)
-      {
-        machinestate = 20 ; //  switch to normal
-      }
-
-     if (emergencyStop)
-      {
-        machinestate = 80 ; // Emergency Stop
-      }
-     if (pidON == 0)
-      {
-        machinestate = 90 ; // offline
-      }
-     if(sensorError)
-      {
-        machinestate = 100 ;// sensorerror
-      }
-    break;
-    // emergencyStop 
-    case 80: 
-      if (!emergencyStop)
-      {
-        machinestate = 20 ; // normal PID
-      }
-      if (pidON == 0)
-      {
-        machinestate = 90 ; // offline
-      }
-      if(sensorError)
-      {
-        machinestate = 100 ;
-      }
-    break;
-    // PID offline
-    case 90: 
-      if (pidON == 1)
-      {
-        if(kaltstart) 
-        {
-        machinestate = 10 ; // kaltstart 
-        }
-        if(!kaltstart) 
-        {
-        machinestate = 20 ; // normal PID
-        }
-      }
-      
-      if(sensorError)
-      {
-        machinestate = 100 ;
-      }
-    break;
-    // sensor error
-    case 100:
-    // Nothing
-    break;
-  } // switch case
-} // end void
+  /********************************************************
+    Setup
+  ******************************************************/
 
 void setup() {
   DEBUGSTART(115200);
@@ -1714,7 +1421,8 @@ void looppid() {
 
     ArduinoOTA.handle();  // For OTA
     // Disable interrupt it OTA is starting, otherwise it will not work
-    ArduinoOTA.onStart([]() {
+    ArduinoOTA.onStart([]() 
+    {
       
       #if defined(ESP8266) 
       timer1_disable();
@@ -1724,7 +1432,8 @@ void looppid() {
       #endif
       digitalWrite(pinRelayHeater, LOW); //Stop heating
     });
-    ArduinoOTA.onError([](ota_error_t error) {
+    ArduinoOTA.onError([](ota_error_t error) 
+    {
       #if defined(ESP8266) 
       timer1_enable(TIM_DIV16, TIM_EDGE, TIM_SINGLE);
       #endif
@@ -1733,7 +1442,8 @@ void looppid() {
       #endif
     });
     // Enable interrupts if OTA is finished
-    ArduinoOTA.onEnd([]() {
+    ArduinoOTA.onEnd([]() 
+    {
       #if defined(ESP8266) 
        timer1_enable(TIM_DIV16, TIM_EDGE, TIM_SINGLE);
       #endif
@@ -1742,30 +1452,36 @@ void looppid() {
       #endif
     });
 
-    if (Blynk.connected()) {  // If connected run as normal
+    if (Blynk.connected()) 
+    {  // If connected run as normal
       Blynk.run();
       blynkReCnctCount = 0; //reset blynk reconnects if connected
-    } else  {
+    } else  
+    {
       checkBlynk();
     }
     wifiReconnects = 0;   //reset wifi reconnects if connected
-  } else {
+  } else 
+  {
     checkWifi();
   }
-    if (TOF != 0) {
-        VL53L0X_RangingMeasurementData_t measure;  //TOF Sensor measurement
-        lox.rangingTest(&measure, false); // pass in 'true' to get debug data printout!
-        distance = measure.RangeMilliMeter;  //write new distance value to 'distance'
-        if (distance <= 1000)
-        {
-        percentage = (100 / (water_empty - water_full))* (water_empty - distance); //calculate percentage of waterlevel
-        }
+
+
+  if (TOF != 0) 
+  {
+    VL53L0X_RangingMeasurementData_t measure;  //TOF Sensor measurement
+    lox.rangingTest(&measure, false); // pass in 'true' to get debug data printout!
+    distance = measure.RangeMilliMeter;  //write new distance value to 'distance'
+    if (distance <= 1000)
+    {
+    percentage = (100 / (water_empty - water_full))* (water_empty - distance); //calculate percentage of waterlevel
     }
+  }
   // voids
     refreshTemp();   //read new temperature values
     testEmergencyStop();  // test if Temp is to high
     #if (BREWMODE == 2)
-    checkWeight() ; // Check Weight Scale in the loop
+      checkWeight() ; // Check Weight Scale in the loop
     #endif
     brew();   //start brewing if button pressed
     checkSteamON(); // check for steam
@@ -1775,39 +1491,41 @@ void looppid() {
     { 
       ETriggervoid();
     }  
-  
 
-  //check if PID should run or not. If not, set to manuel and force output to zero
-  if (pidON == 0 && pidMode == 1) {
-    pidMode = 0;
-    bPID.SetMode(pidMode);
-    Output = 0 ;
+ #if DISPLAY != 0
+      unsigned long currentMillisDisplay = millis();
+      if (currentMillisDisplay - previousMillisDisplay >= 100) 
+      {
+        DisplayShottimer() ;
+      }
+      if (currentMillisDisplay - previousMillisDisplay >= intervalDisplay) 
+      {
+        previousMillisDisplay = currentMillisDisplay;
+        #if DISPLAYTEMPLATE < 20 // not in vertikal template
+          Displaylogo();
+        #endif
+        printScreen();  // refresh display
+      }  
+  #endif  
+
+
+  // OFFLINE
+  if (machinestate == 90) // Offline see machinestate.h
+  {
+    if (pidMode == 1)
+    { 
+      // Force PID shutdown
+      pidMode = 0;
+      bPID.SetMode(pidMode);
+      Output = 0 ;
+    }
   } else if (pidON == 1 && pidMode == 0 && !sensorError && !emergencyStop && backflushState == 10) {
     pidMode = 1;
     bPID.SetMode(pidMode);
   }
-
-  //Sicherheitsabfrage
-  if (!sensorError && Input > 0 && !emergencyStop && backflushState == 10 && (backflushON == 0 || brewcounter > 10)) {
-    brewdetection();  //if brew detected, set PID values
-      #if DISPLAY != 0
-          unsigned long currentMillisDisplay = millis();
-          if (currentMillisDisplay - previousMillisDisplay >= 100) 
-          {
-          displayShottimer() ;
-          }
-          if (currentMillisDisplay - previousMillisDisplay >= intervalDisplay) {
-            previousMillisDisplay = currentMillisDisplay;
-            #if DISPLAYTEMPLATE < 20 // not in vertikal template
-              heatinglogo(); 
-              OFFlogo(); 
-              steamLogo();
-            #endif
-            printScreen();  // refresh display
-      #endif
-      }
-    //Set PID if first start of machine detected, and no SteamON
-    if ((Input < BrewSetPoint) && kaltstart && SteamON == 0) {
+  // Coldstart State
+  if (machinestate == 10 && machinestate == 19) // Cold Start states 
+    {
       if (startTn != 0) {
         startKi = startKp / startTn;
       } else {
@@ -1815,7 +1533,11 @@ void looppid() {
       }
       bPID.SetTunings(startKp, startKi, 0, P_ON_M);
     // normal PID
-    } else if (timerBrewdetection == 0 && SteamON == 0) {    //Prevent overwriting of brewdetection values
+    } 
+  // Normale PID STATE  
+    if(machinestate == 20 ) // only normal PID
+    {   
+       brewdetection(); // new State 
       // calc ki, kd
       if (aggTn != 0) {
         aggKi = aggKp / aggTn ;
@@ -1826,8 +1548,9 @@ void looppid() {
       bPID.SetTunings(aggKp, aggKi, aggKd, PonE);
       kaltstart = false;
     }
-    // BD PID
-    if ( millis() - timeBrewdetection  < brewtimersoftware * 1000 && timerBrewdetection == 1 && SteamON == 0) {
+  // BD PID
+    if (machinestate >= 31 && machinestate <= 35) // Only Brew
+    { // Only 
       // calc ki, kd
       if (aggbTn != 0) {
         aggbKi = aggbKp / aggbTn ;
@@ -1837,8 +1560,8 @@ void looppid() {
       aggbKd = aggbTv * aggbKp ;
       bPID.SetTunings(aggbKp, aggbKi, aggbKd, PonE) ;
     }
-    // Steamon
-    if (SteamON == 1)
+  // Steam on
+    if (machinestate == 40) // STEAM
     {
        if (aggTn != 0) {
         aggKi = aggKp / aggTn ;
@@ -1850,7 +1573,7 @@ void looppid() {
       bPID.SetTunings(150, 0, 0, PonE);
     }
 
-  } else if (sensorError) 
+  if (machinestate == 90) //Emergency stop 
   {
     //Deactivate PID
     if (pidMode == 1) 
@@ -1860,38 +1583,16 @@ void looppid() {
       Output = 0 ;
     }
     digitalWrite(pinRelayHeater, LOW); //Stop heating
-      #if DISPLAY != 0
-        displayMessage("Error, Temp: ", String(Input), "Check Temp. Sensor!", "", "", ""); //DISPLAY AUSGABE
-      #endif 
-  } else if (emergencyStop) 
-  {
-    //Deactivate PID
-    if (pidMode == 1) 
-    {
-      pidMode = 0;
-      bPID.SetMode(pidMode);
-      Output = 0 ;
-    }
-
-    digitalWrite(pinRelayHeater, LOW); //Stop heating
-    #if DISPLAY != 0
-      displayEmergencyStop();
-    #endif 
   } 
-  else if (backflushON || backflushState > 10) {
-    if (backflushState == 43) {
-      #if DISPLAY != 0
-        displayMessage("Backflush finished", "Please reset brewswitch...", "", "", "", "");
-      #endif 
-    } else if (backflushState == 10) {
-      #if DISPLAY != 0
-        displayMessage("Backflush activated", "Please set brewswitch...", "", "", "", "");
-      #endif
-    } else if ( backflushState > 10) {
-      #if DISPLAY != 0
-        displayMessage("Backflush running:", String(flushCycles), "from", String(maxflushCycles), "", "");
-      #endif
+  if (machinestate == 100) //sensor error
+  {
+    //Deactivate PID
+    if (pidMode == 1) 
+    {
+      pidMode = 0;
+      bPID.SetMode(pidMode);
+      Output = 0 ;
     }
+    digitalWrite(pinRelayHeater, LOW); //Stop heating
   }
-
 }

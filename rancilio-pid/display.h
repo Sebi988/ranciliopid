@@ -60,6 +60,8 @@
     *****************************************************/
     void displayEmergencyStop(void) 
     {
+        if (machinestate == 90)
+        {
         u8g2.clearBuffer();
         u8g2.setFont(u8g2_font_profont11_tf); // set font
         u8g2.drawXBMP(0, 0, logo_width, logo_height, logo_bits_u8g2);   //draw temp icon
@@ -76,7 +78,7 @@
         u8g2.print((char)176);
         u8g2.print("C");
 
-    //draw current temp in icon
+        //draw current temp in icon
         if (isrCounter < 500)
         {
                 u8g2.drawLine(9, 48, 9, 5);
@@ -88,6 +90,7 @@
                 u8g2.print("PID STOPPED");
         }
         u8g2.sendBuffer();
+        }
     }
     /********************************************************
      DISPLAY - Calibrationmode
@@ -105,7 +108,7 @@
      DISPLAY - Shottimer
     *****************************************************/
 
-       void displayShottimer(void) 
+       void DisplayShottimer(void) 
      {
         displaystatus = 0 ;// Indiktator für Reset Bezug im Display
         if ((machinestate == 30 )  && SHOTTIMER == 1)  // Shotimer muss 1 = True sein und Bezug vorliegen
@@ -141,9 +144,9 @@
     /********************************************************
      DISPLAY - Heatinglogo
     *****************************************************/
-     void heatinglogo(void) 
+    void Displaylogo(void) 
     {
-         if (HEATINGLOGO  > 0 && machinestate == 10 ) 
+        if (HEATINGLOGO  > 0 && machinestate == 10 ) 
         {
            // Für Statusinfos
            u8g2.clearBuffer();
@@ -216,36 +219,44 @@
           u8g2.setFont(u8g2_font_profont17_tf);
           u8g2.print(Input,1);         
           u8g2.sendBuffer();
-      }
-    }
-    
-    /********************************************************
-     DISPLAY - PID Off Logo
-    *****************************************************/
+        }
+       
+        /********************************************************
+         DISPLAY - PID Off Logo
+        *****************************************************/
 
-     void OFFlogo(void) 
-    {
-     if (OFFLINEGLOGO == 1 && machinestate == 90)
-     {
-       u8g2.clearBuffer();
-       u8g2.drawXBMP(38,0, OFFLogo_width, OFFLogo_height, OFFLogo); 
-       u8g2.setCursor(0, 55);
-       u8g2.setFont(u8g2_font_profont10_tf);
-       u8g2.print("PID is disabled manually");   
-       u8g2.sendBuffer();
-     }
-    }
-    void steamLogo(void) 
-    {
-     if (machinestate == 40)
-     {
-       u8g2.clearBuffer();
-       u8g2.drawXBMP(0,0, steamlogo_width, steamlogo_height, steamlogo); 
-       u8g2.setCursor(64, 25);
-       u8g2.setFont(u8g2_font_profont22_tf);
-       u8g2.print(Input, 0);
-       u8g2.setCursor(64, 25);
-       u8g2.sendBuffer();
-     }
+        if (OFFLINEGLOGO == 1 && machinestate == 90)
+        {
+            u8g2.clearBuffer();
+            u8g2.drawXBMP(38,0, OFFLogo_width, OFFLogo_height, OFFLogo); 
+            u8g2.setCursor(0, 55);
+            u8g2.setFont(u8g2_font_profont10_tf);
+            u8g2.print("PID is disabled manually");   
+            u8g2.sendBuffer();
+        }
+        /********************************************************
+        DISPLAY - Steamlogo
+        *****************************************************/
+
+        if (machinestate == 40)
+        {
+            u8g2.clearBuffer();
+            u8g2.drawXBMP(0,0, steamlogo_width, steamlogo_height, steamlogo); 
+            u8g2.setCursor(64, 25);
+            u8g2.setFont(u8g2_font_profont22_tf);
+            u8g2.print(Input, 0);
+            u8g2.setCursor(64, 25);
+            u8g2.sendBuffer();
+        }
+        if (machinestate == 100)
+        {    
+            displayMessage("Error, Temp: ", String(Input), "Check Temp. Sensor!", "", "", ""); //DISPLAY AUSGABE
+        }
+        if (machinestate == 100)
+        {    
+            displayMessage("Error, Temp: ", String(Input), "Check Temp. Sensor!", "", "", ""); //DISPLAY AUSGABE
+        }
+
+
     }
 #endif
