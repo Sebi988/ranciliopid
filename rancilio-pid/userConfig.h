@@ -1,11 +1,11 @@
 /********************************************************
-  Version 2.2 (04.02.2021) 
+  Version 2.2 (04.02.2021)
   Last Change: code cleanup
   Values must be configured by the user
 ******************************************************/
 
 #ifndef _userConfig_H
-#define _userConfig_H  
+#define _userConfig_H
 
 /********************************************************
    Preconfiguration
@@ -17,7 +17,7 @@
 #define MACHINELOGO 1              // 1 = Rancilio, 2 = Gaggia, 3 = QuickMill
 #define DISPALYROTATE U8G2_R0      // rotate display clockwise: U8G2_R0 = no rotation; U8G2_R1 = 90°; U8G2_R2 = 180°; U8G2_R3 = 270°
 #define SHOTTIMER 0                // 0 = deactivated, 1 = activated
-#define HEATINGLOGO 0              // 0 = deactivated, 1 = Rancilio, 2 = Gaggia 
+#define HEATINGLOGO 0              // 0 = deactivated, 1 = Rancilio, 2 = Gaggia
 #define OFFLINEGLOGO 1             // 0 = deactivated, 1 = activated
 #define BREWSWITCHDELAY 3000       // time in ms
 
@@ -29,10 +29,10 @@
 // PID & Hardware
 #define ONLYPID 1                  // 1 = Only PID, 0 = PID and preinfusion
 #define BREWMODE 1                 // 1 = NORMAL preinfusion ; 2 = Sale with weight
-#define BREWDETECTION 1            // 0 = off, 1 = Software (Onlypid 1), 2 = Hardware (Onlypid 0), 3 = Sensor/Hardware for Only PID 
-#define COLDSTART_PID 1            // 1 = default coldstart values, 2 = custom values via blynk (expert mode activated) 
+#define BREWDETECTION 1            // 0 = off, 1 = Software (Onlypid 1), 2 = Hardware (Onlypid 0), 3 = Sensor/Hardware for Only PID
+#define COLDSTART_PID 1            // 1 = default coldstart values, 2 = custom values via blynk (expert mode activated)
 #define TRIGGERTYPE HIGH           // LOW = low trigger, HIGH = high trigger relay // BREWDETECTION 3 configuration
-#define VOLTAGESENSORTYPE HIGH 
+#define VOLTAGESENSORTYPE HIGH
 #define PINMODEVOLTAGESENSOR INPUT // Mode INPUT_PULLUP, INPUT or INPUT_PULLDOWN_16 (Only Pin 16)
 
 // TOF sensor for water level
@@ -47,10 +47,11 @@
 #define ETRIGGERTIME 60            // seconds, time between trigger signal
 #define TRIGGERRELAYTYPE HIGH      // LOW = low trigger, HIGH = high trigger relay for E-Trigger
 
-//Weight SCALE
-#define WEIGHTSETPOINT 30          // Gramm 
+//Weight SCALE & Calibration
+#define WEIGHTSETPOINT 30          // Gramm
+#define CALIBRATIONVALUE 3195.83  // Use calibration example in HX711 library to get value
 
-/// Wifi 
+/// Wifi
 #define HOSTNAME "Rancilio"
 #define D_SSID "myssid"
 #define PASS "mypass"
@@ -68,12 +69,12 @@
 #define MQTT_PASSWORD "mypass"
 #define MQTT_TOPIC_PREFIX "custom/Küche."  // topic will be "<MQTT_TOPIC_PREFIX><HOSTNAME>/<READING>"
 #define MQTT_SERVER_IP "XXX.XXX.XXX.XXX"  // IP-Address of locally installed mqtt server
-#define MQTT_SERVER_PORT 1883    
+#define MQTT_SERVER_PORT 1883
 
 // BLynk
 #define AUTH "myauth"
 #define BLYNKADDRESS "blynk.clevercoffee.de"  // blynk-server IP-Address
-#define BLYNKPORT 8080             // blynk-server portver 
+#define BLYNKPORT 8080             // blynk-server portver
 
 // PID - offline values
 #define SETPOINT 95                // Temperatur setpoint
@@ -88,7 +89,7 @@
 
 // PID - offline brewdetection values
 #define AGGBKP 50                  // Kp
-#define AGGBTN 0                   // Tn 
+#define AGGBTN 0                   // Tn
 #define AGGBTV 20                  // Tv
 
 // Backflush values
@@ -108,10 +109,10 @@
 #define STEAMONPIN 17              // STEAM active
 #define OLED_SCL 5                 // Output pin for dispaly clock pin
 #define OLED_SDA 4                 // Output pin for dispaly data pin
-#define HXDATPIN 99                // weight scale PIN 
-#define HXCLKPIN 99                // weight scale PIN  
+#define HXDATPIN 99                // weight scale PIN
+#define HXCLKPIN 99                // weight scale PIN
 #define SCREEN_WIDTH 128           // OLED display width, in pixels
-#define SCREEN_HEIGHT 64           // OLED display height, in pixels  
+#define SCREEN_HEIGHT 64           // OLED display height, in pixels
 
 // Historic (no settings)
 #define PONE 1                     // 1 = P_ON_E (default), 0 = P_ON_M (special PID mode, other PID-parameter are needed)

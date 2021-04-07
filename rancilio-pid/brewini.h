@@ -3,7 +3,7 @@
 ******************************************************/
 
 #if PINBREWSWITCH == 0
-const int analogPin = 0; // AI0 will be used 
+const int analogPin = 0; // AI0 will be used
 #endif
 
 
@@ -12,7 +12,7 @@ const int analogPin = 0; // AI0 will be used
    Normal BREW
 ******************************************************/
 
-#if (BREWMODE == 1) // old Brew MODE 
+#if (BREWMODE == 1) // old Brew MODE
 int brewcounter = 10;
 int brewswitch = 0;
 boolean brewswitchWasOFF = false;
@@ -22,7 +22,7 @@ double preinfusion = 2000;  //preinfusion time in ms
 double preinfusionpause = 5000;   //preinfusion pause time in ms
 double bezugsZeit = 0;   //total brewed time
 double lastbezugszeitMillis = 0; // for shottimer delay after disarmed button
-double lastbezugszeit = 0 ; 
+double lastbezugszeit = 0 ;
 unsigned long startZeit = 0;    //start time of brew
 const unsigned long analogreadingtimeinterval = 10 ; // ms
 unsigned long previousMillistempanalogreading ; // ms for analogreading
@@ -31,7 +31,7 @@ unsigned long previousMillistempanalogreading ; // ms for analogreading
 /********************************************************
   BREW WITH SCALE
 ******************************************************/
-#if (BREWMODE ==  2) 
+#if (BREWMODE ==  2)
 int brewcounter = 10;
 int brewswitch = 0;
 boolean brewswitchWasOFF = false;
@@ -41,7 +41,7 @@ double preinfusion = 2000;  //preinfusion time in ms
 double preinfusionpause = 5000;   //preinfusion pause time in ms
 double bezugsZeit = 0;   //total brewed time
 double lastbezugszeitMillis = 0; // for shottimer delay after disarmed button
-double lastbezugszeit = 0 ; 
+double lastbezugszeit = 0 ;
 unsigned long startZeit = 0;    //start time of brew
 const unsigned long analogreadingtimeinterval = 10 ; // ms
 unsigned long previousMillistempanalogreading ; // ms for analogreading
@@ -49,7 +49,7 @@ unsigned long previousMillistempanalogreading ; // ms for analogreading
 
 
 float weightSetpoint = WEIGHTSETPOINT;
-float calibrationValue = 3195.83; // use calibration example to get value
+float calibrationValue = CALIBRATIONVALUE;
 float weight = 0;   // value from HX711
 float weightPreBrew = 0;  // value of scale before wrew started
 float weightBrew = 0;  // weight value of brew
